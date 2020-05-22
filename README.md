@@ -1,7 +1,8 @@
 # YoungCorrector
 本项目是参考开源框架 [Pycorrector](https://github.com/shibing624/pycorrector)，自己实现了一套基于规则的纠错系统。
 相比 [Pycorrector](https://github.com/shibing624/pycorrector)，在有限的数据上性能差不多，但是速度比 [Pycorrector](https://github.com/shibing624/pycorrector) 快 2 倍。
-代码还没有完善，后续会持续更新。。。
+总体来说，基于规则的文本纠错，性能取决于纠错词典和分词质量。
+代码还没有完善，还有很多优化的空间，后续会持续更新。。。
 
 ```python
 ('吴先生是修理脚踏车的拿手', [])
