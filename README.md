@@ -1,6 +1,6 @@
 # YoungCorrector
 本项目是参考开源框架 [Pycorrector](https://github.com/shibing624/pycorrector)，自己实现了一套基于规则的纠错系统。
-总体来说，基于规则的文本纠错，性能取决于纠错词典和分词质量。
+总体来说，基于规则的文本纠错，性能取决于纠错词典和分词质量。目前与 [Pycorrector](https://github.com/shibing624/pycorrector) 相比，在准确率差不多的情况下，本模型所用的时间会少很多（归功于前向最大匹配替代了直接索引混淆词典）
 代码还没有完善，还有很多优化的空间，后续会持续更新。。。
 
 ## 中文文本纠错
@@ -97,20 +97,6 @@
 
 
 ### 功能模块
-
-1. 语言模型（kenlm，自定义ngram，DNNLM）
-   * score(sentence) ：计算文本得分
-   * ppl(sentence)：困惑度
-   * Model(path)：加载模型
-2. 分词器（jieba，自定义分词器）
-   * tokenize(sentence)
-3. 资源加载
-   * 加载混淆词典
-   * 加载通用词典
-   * 加载音近词典
-   * 加载形近词典
-   * 加载分词词典
-4.### 功能模块
 
 1. 语言模型（kenlm，自定义ngram，DNNLM）
    * score(sentence) ：计算文本得分
