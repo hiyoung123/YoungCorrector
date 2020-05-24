@@ -162,6 +162,25 @@ class Corrector(object):
                 return True
         return False
 
+    def _get_max_len(self, d):
+        return max(map(len, [w for w in d]))
+
+    def FMM(self, word_dict, token, window_size=5):
+        idxs = []
+        result = []
+        index = 0
+        text_size = len(token)
+        while text_size > index:
+            for size in range(window_size + index, index, -1):
+                piece = token[index:size]
+                if piece in word_dict:
+                    index = size - 1
+                    idxs.append(index-len(piece)+1)
+                    result.append(piece)
+                    break
+            index = index + 1
+        return idxs, result
+
     def _is_filter_token(self, token):
         # 空
         if not token.strip():
@@ -214,13 +233,23 @@ class Corrector(object):
         :param sentence: 输入文本
         :param start_idx: 在源文本中的索引
         """
-        # 直接索引
-        for confuse in self.confusion_dict:
-            idx = sentence.find(confuse)
-            if idx > -1:
+        # 直接索引-遍历大列表匹配小的 : 每条耗时 0.0002701282501220703 s
+        # stat_time = time.time()
+        # for confuse in self.confusion_dict:
+        #     idx = sentence.find(confuse)
+        #     if idx > -1:
+        #         maybe_err = [confuse, idx + start_idx, idx + len(confuse) + start_idx, ErrorType.confusion]
+        #         if maybe_err not in maybe_errors and not self._check_in_errors(maybe_errors, maybe_err):
+        #             maybe_errors.append(maybe_err)
+        # 前向最大匹配-遍历小的匹配大的：
+        max_len = self._get_max_len(self.confusion_dict.keys())
+        idxs, confuses = self.FMM(self.confusion_dict, sentence, max_len)
+        if len(idxs) > 0:
+            for idx, confuse in zip(idxs, confuses):
                 maybe_err = [confuse, idx + start_idx, idx + len(confuse) + start_idx, ErrorType.confusion]
                 if maybe_err not in maybe_errors and not self._check_in_errors(maybe_errors, maybe_err):
                     maybe_errors.append(maybe_err)
+        # print('detect_by_confusion 耗时： {}'.format(time.time()-stat_time))
 
     def _detect_by_token(self, maybe_errors, sentence, start_idx):
         """
@@ -247,7 +276,7 @@ class Corrector(object):
         try:
             ngram_avg_scores = []
             tokens = [x for x in self.tokenizer.cut(sentence)]
-            for n in [2, 3, 4]:
+            for n in [1, 2, 3]:
                 scores = []
                 for i in range(len(tokens) - n + 1):
                     word = tokens[i:i + n]
@@ -286,7 +315,7 @@ class Corrector(object):
     def _detect_by_char_ngrm(self, maybe_errors, sentence, start_idx):
         try:
             ngram_avg_scores = []
-            for n in [2, 3, 4, 5]:
+            for n in [1, 2, 3, 4]:
                 scores = []
                 for i in range(len(sentence) - n + 1):
                     word = sentence[i:i + n]
@@ -470,9 +499,12 @@ if __name__ == "__main__":
 
     corrector = Corrector(config)
     text = [
+        '这件事情针让人想象难以',
+        '这周末我要去配副眼睛',
+        '那个男人真是个氓流',
         '吴先生是修理脚踏车的拿手',
         '夏洛的烦恼',
-        "新家坡总理李隆基发表了中药讲话",
+        "新家坡总理李隆基发表了重要讲话说新家坡是伟大的国家",
         "D超很先近！",
         '感帽了',
             '你儿字今年几岁了',
@@ -493,3 +525,4 @@ if __name__ == "__main__":
         x = corrector.correct(x)
         print(x)
     print(time.time() - start)
+
