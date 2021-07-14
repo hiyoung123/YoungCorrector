@@ -406,7 +406,7 @@ class Corrector(object):
 
             if pre_item is None:
                 pre_item = [cur_item, begin_idx, end_idx, err_type]
-                res.append(pre_item)
+                res.add(pre_item)
                 continue
             if ErrorType.char == err_type and err_type == pre_item[3] and begin_idx == pre_item[2]:
                 pre_item = [pre_item[0]+cur_item, pre_item[1], end_idx, ErrorType.word]
